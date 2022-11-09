@@ -25,11 +25,12 @@ def hello():
 #         return []
 
 def getGeometry(from_pos, to_pos):
-    url = f"https://api.mapbox.com/directions/v5/mapbox/driving/{from_pos[1]},{from_pos[0]};{to_pos[1]},{to_pos[0]}?access_token={MAPBOX_TOKEN}"
+    url = f"https://api.mapbox.com/directions/v5/mapbox/driving-traffic/{from_pos[1]},{from_pos[0]};{to_pos[1]},{to_pos[0]}?access_token={MAPBOX_TOKEN}"
     resp = requests.get(url)
     if resp.status_code == 200:
         response_object = json.loads(resp.content)
         try:
+            print(response_object)
             return response_object['routes'][0]['geometry']
         except:
             raise Exception("Could not extract geometry data") 
@@ -40,13 +41,16 @@ def getGeometry(from_pos, to_pos):
 def run():
     errors = []
 
-    depot = [request.form['depot-lat'], request.form['depot-lng']]
+    depot = [request.form['depot-lat'], request.form['depot-lng'], 0, 'Depot']
+
+    vehicle_capacity = request.form['vehicle-capacity']
 
     dest_lat = request.form.getlist('destination-lat[]')
     dest_lng = request.form.getlist('destination-lng[]')
+    dest_cap = request.form.getlist('destination-cap[]')
     destinations = []
     for i in range(len(dest_lat)):
-        destinations.append([dest_lat[i], dest_lng[i]])
+        destinations.append([dest_lat[i], dest_lng[i], dest_cap[i], f'Destination #{i}'])
 
     waypoints = [depot]
     geometry = []
