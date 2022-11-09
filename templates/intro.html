@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block header %}
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block title %}Location-based Services{% endblock %}
+{% block content %}
+    <h1>CVRP (Capacitated vehicle Routing Problem)</h1>
+    <p>
+        The VRP case is actually quite complex, but it is familiar and has been discussed a lot in research. In real life, VRP is often applied to solve problems related to regulation and route determination so that the distance that must be traveled in the distribution of goods is optimal.
+    </p>
+    <p>
+        The CVRP (Capacitated Vehicle Routing Problem) is a type of VRP with limited capacity.
+    </p>
+    <p>In this project, there are limitations:</p>
+    <ol>
+        <li>Number of vehicle is 1.</li>
+        <li>The vehicle has capacity of 30.</li>
+        <li>Number of maximum destination points is 15 since it's just prototype.</li>
+        <li>The method is K-means clustering.</li>
+    </ol>
+{% endblock %}
