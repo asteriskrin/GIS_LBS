@@ -5,17 +5,30 @@
 {% block title %}Location-based Services{% endblock %}
 {% block content %}
     <h1>CVRP (Capacitated vehicle Routing Problem)</h1>
-    <p>
-        The VRP case is actually quite complex, but it is familiar and has been discussed a lot in research. In real life, VRP is often applied to solve problems related to regulation and route determination so that the distance that must be traveled in the distribution of goods is optimal.
-    </p>
-    <p>
-        The CVRP (Capacitated Vehicle Routing Problem) is a type of VRP with limited capacity.
-    </p>
-    <p>In this project, there are limitations:</p>
-    <ol>
-        <li>Number of vehicle is 1.</li>
-        <li>The vehicle has capacity of 30.</li>
-        <li>Number of maximum destination points is 15 since it's just prototype.</li>
-        <li>The method is K-means clustering.</li>
-    </ol>
+    <div class="row">
+        <div class="col">
+            <p>
+                The VRP case is actually quite complex, but it is familiar and has been discussed a lot in research. In real life, VRP is often applied to solve problems related to regulation and route determination so that the distance that must be traveled in the distribution of goods is optimal.
+            </p>
+            <p>
+                The CVRP (Capacitated Vehicle Routing Problem) is a type of VRP with limited capacity.
+            </p>
+            <p>In this project, there are limitations:</p>
+            <ol>
+                <li>Number of vehicle is 1.</li>
+                <li>Number of maximum destination points is 15 since it's just prototype.</li>
+                <li>The method is NNA for now.</li>
+            </ol>
+        </div>
+        <div class="col">
+            <figure>
+                <img src="{{ url_for('static', filename= 'css/images/An-example-of-CVRP-with-a-central-depot-10-consumers-and-three-tours.png') }}" alt="CVRP Illustration" class="img-fluid">
+                <figcaption>Lopes, Heitor & Dalle, Vilson & Carlos, Molle & Erig Lima, Carlos. (2005). An ant colony optimization system for the capacitated vehicle routing problem.</figcaption>
+            </figure>
+            <figure>
+                <img src="https://user-images.githubusercontent.com/51239551/88507610-bfdd5480-d017-11ea-99de-e9850e6be0db.gif" alt="CVRP Animated">
+                <figcaption>Source: https://github.com/Rintarooo/VRP_DRL_MHA</figcaption>
+            </figure>
+        </div>
+    </div>
 {% endblock %}

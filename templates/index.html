@@ -14,29 +14,53 @@
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
+    var geometries = [];
+    
+    function addSegment(i, encoded_geometries) {
+        // Decode
+        let p = polyline.decode(encoded_geometries);
+        let p2 = L.polyline(p, {color: geometries[i].color});
+        geometries[i].polylines.push(p2);
+        p2.addTo(map);
+    }
+
+    function addMarker(lat, lng, cap, name) {
+        let m = L.marker([lat, lng]).addTo(map);
+        m.bindPopup(name + " / " + cap + " capacity");
+    }
+
     {% if result %}
-    var decoded_polyline, created_marker, randomColor;
-    {% for g in result['geometry'] %}
-        decoded_polyline = polyline.decode('{{ g }}');
-        console.log(decoded_polyline)
-        randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-        L.polyline(decoded_polyline, {color: randomColor}).addTo(map);
-    {% endfor %}
-    {% for w in result['waypoints'] %}
-    created_marker = L.marker([{{w[0]}}, {{w[1]}}]).addTo(map);
-    created_marker.bindPopup("{{ w[3] }} / {{ w[2] }} capacity");
-    {% endfor %}
+        // Generate route
+        {% for i in range(result|count) %}
+            geometries[{{ i }}] = {
+                // color: '#' + Math.floor(Math.random()*16777215).toString(16),
+                color: 'red',
+                polylines: []
+            };
+            {% for g in result[i]['geometry'] %}
+                addSegment({{ i }}, "{{ g }}");
+            {% endfor %}
+            {% for w in result[i]['waypoint'] %}
+                addMarker({{ w[0] }}, {{ w[1] }}, {{ w[2] }}, "{{ w[3] }}");
+            {% endfor %}
+        {% endfor %}
     {% endif %}
+
+    function hideGeometry(i) {
+        geometries[i].polylines.forEach(function (val) {
+            map.removeLayer(val);
+        });
+    }
+
+    function showGeometry(i) {
+        geometries[i].polylines.forEach(function (val) {
+            map.addLayer(val);
+        });
+    }
 
     var state_drop_pin = -1;
     function dropPin(num) {
         state_drop_pin = num;
-        // if (num == 0) {
-        //     alert("Click on map for depot location!");
-        // }
-        // else {
-        //     alert("Click on map for destination " + (num-1) + "!");
-        // }
     }
 
     map.on('click', function(e) {
@@ -96,11 +120,9 @@
 {% endblock %}
 {% block title %}Location-based Services{% endblock %}
 {% block content %}
-    <h1>CVRP Prototype</h1>
+    <h1 class="mb-2">CVRP Prototype</h1>
     <div class="row">
         <div class="col">
-            <button id="my-location" class="btn btn-primary">My location</button>
-            <p>Let's go simulate it! ehe</p>
             <form method="POST" action="/run">
                 <div class="form-group">
                     <div class="row">
@@ -124,12 +146,34 @@
                 <div id="destination-list">
 
                 </div>
+                <button id="my-location" class="btn btn-sm btn-secondary">My location</button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="addDestination()">+ Destination</button>
                 <button type="submit" class="btn btn-primary btn-sm">Run</button>
             </form>
+
+            {% if result %}
+                <h4 class="mt-4">Result</h4>
+                {% for i in range(result|count) %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h5 class="card-title">Route {{ i }}</h5>
+                            <ol>
+                            {% for w in result[i]['waypoint'] %}
+                                <li>{{ w[3] }}</li>
+                            {% endfor %}
+                            </ol>
+                            <button class="btn btn-sm btn-secondary" onclick="hideGeometry({{ i }})">Hide</button>
+                            <button class="btn btn-sm btn-secondary" onclick="showGeometry({{ i }})">Show</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
         <div class="col">
             <div id="map"></div>
         </div>
+    </div>
+    <div class="text-center mt-4 mb-2">
+        Powered by JQuery, Popper, Bootstrap, Leaflet, Flask, MapBox
     </div>
 {% endblock %}
