@@ -32,10 +32,11 @@ Return:
 [geometry, distance, duration]
 '''
 def getSegmentData(from_pos, to_pos):
-    url = f"https://api.mapbox.com/directions/v5/mapbox/driving-traffic/{from_pos[1]},{from_pos[0]};{to_pos[1]},{to_pos[0]}?access_token={MAPBOX_TOKEN}"
+    url = f"https://api.mapbox.com/directions/v5/mapbox/driving-traffic/{from_pos[1]}%2C{from_pos[0]}%3B{to_pos[1]}%2C{to_pos[0]}?alternatives=true&geometries=polyline&language=en&overview=simplified&steps=true&access_token={MAPBOX_TOKEN}"
     resp = requests.get(url)
+    requests.encoding = 'ISO-8859-1'
     if resp.status_code == 200:
-        response_object = json.loads(resp.content)
+        response_object = resp.json()
         try:
             return [response_object['routes'][0]['geometry'],
                 response_object['routes'][0]['distance'],
@@ -104,18 +105,23 @@ def run():
     node_size = len(nodes)
     matrix_duration = np.zeros((node_size, node_size))
     matrix_distance = np.zeros((node_size, node_size))
-    matrix_geometry = [[""]*node_size]*node_size
+    matrix_geometry = []
 
     for i in range(node_size):
+        mg = []
         for j in range(node_size):
             if i == j:
                 matrix_distance[i][j] = 0.0
                 matrix_duration[i][j] = 0.0
+                mg.append(None)
             else:
                 segment_data = getSegmentData([nodes[i][0], nodes[i][1]], [nodes[j][0], nodes[j][1]])
-                matrix_geometry[i][j] = segment_data[0]
+                mg.append(segment_data[0])
                 matrix_distance[i][j] = segment_data[1]
                 matrix_duration[i][j] = segment_data[2]
+        matrix_geometry.append(mg)
+
+    print(matrix_geometry)
 
     tour = run_nna(vehicle_capacity, nodes, matrix_geometry, matrix_distance, matrix_duration, node_size)
     result = []
@@ -128,8 +134,11 @@ def run():
             id = t[i]
             waypoints.append(nodes[id])
             if id != 0:
-                geometry.append(matrix_geometry[curr_pos][id])
-            curr_pos = id
+                g = matrix_geometry[curr_pos][id]
+                # escape string
+                g = g.replace('\\', '\\\\')
+                geometry.append(g)
+                curr_pos = id
         result.append({
             "waypoint": waypoints,
             "geometry": geometry
