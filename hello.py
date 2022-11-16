@@ -124,9 +124,11 @@ def run():
         waypoints = []
         geometry = []
         curr_pos = 0
-        for id in t:
+        for i in range(len(t)):
+            id = t[i]
             waypoints.append(nodes[id])
-            geometry.append(matrix_geometry[curr_pos][id])
+            if id != 0:
+                geometry.append(matrix_geometry[curr_pos][id])
             curr_pos = id
         result.append({
             "waypoint": waypoints,
