@@ -3,6 +3,7 @@ import json
 import requests
 import urllib.parse
 import numpy as np
+from classes.ThreadWithResult import ThreadWithResult
 
 MAPBOX_TOKEN = "pk.eyJ1IjoiYXN0ZXJpc2tyaW4iLCJhIjoiY2xhNm9mMnJwMXBteTN2cGg0dGlzOXlqdSJ9.ePzEH5xX7_B3aty_s9V7OQ"
 
@@ -106,22 +107,31 @@ def run():
     matrix_duration = np.zeros((node_size, node_size))
     matrix_distance = np.zeros((node_size, node_size))
     matrix_geometry = []
-
+    # Making matrix
     for i in range(node_size):
-        mg = []
+        temp = []
+        for j in range(node_size):
+            temp.append(None)
+        matrix_geometry.append(temp)
+
+    threads_data = []
+    for i in range(node_size):
         for j in range(node_size):
             if i == j:
                 matrix_distance[i][j] = 0.0
                 matrix_duration[i][j] = 0.0
-                mg.append(None)
             else:
-                segment_data = getSegmentData([nodes[i][0], nodes[i][1]], [nodes[j][0], nodes[j][1]])
-                mg.append(segment_data[0])
-                matrix_distance[i][j] = segment_data[1]
-                matrix_duration[i][j] = segment_data[2]
-        matrix_geometry.append(mg)
+                t = ThreadWithResult(target=getSegmentData, args=([nodes[i][0], nodes[i][1]], [nodes[j][0], nodes[j][1]],))
+                t.start()
+                t.join()
+                threads_data.append([i, j, t])
 
-    print(matrix_geometry)
+    for td in threads_data:
+        tdr = td[2].result
+        matrix_geometry[td[0]][td[1]] = tdr[0]
+        matrix_distance[td[0]][td[1]] = tdr[1]
+        matrix_duration[td[0]][td[1]] = tdr[2]
+
 
     tour = run_nna(vehicle_capacity, nodes, matrix_geometry, matrix_distance, matrix_duration, node_size)
     result = []
