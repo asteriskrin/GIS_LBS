@@ -33,7 +33,7 @@ Return:
 [geometry, distance, duration]
 '''
 def getSegmentData(from_pos, to_pos):
-    url = f"https://api.mapbox.com/directions/v5/mapbox/driving-traffic/{from_pos[1]}%2C{from_pos[0]}%3B{to_pos[1]}%2C{to_pos[0]}?alternatives=true&geometries=polyline&language=en&overview=simplified&steps=true&access_token={MAPBOX_TOKEN}"
+    url = f"https://api.mapbox.com/directions/v5/mapbox/driving/{from_pos[1]}%2C{from_pos[0]}%3B{to_pos[1]}%2C{to_pos[0]}?alternatives=true&geometries=polyline&language=en&overview=simplified&steps=true&access_token={MAPBOX_TOKEN}"
     resp = requests.get(url)
     requests.encoding = 'ISO-8859-1'
     if resp.status_code == 200:
