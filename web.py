@@ -5,7 +5,7 @@ import urllib.parse
 import numpy as np
 from classes.ThreadWithResult import ThreadWithResult
 
-MAPBOX_TOKEN = "pk.eyJ1IjoiYXN0ZXJpc2tyaW4iLCJhIjoiY2xhNm9mMnJwMXBteTN2cGg0dGlzOXlqdSJ9.ePzEH5xX7_B3aty_s9V7OQ"
+MAPBOX_TOKEN = "PASTE_HERE"
 
 app = Flask(__name__)
 
