@@ -10,21 +10,8 @@ MAPBOX_TOKEN = "pk.eyJ1IjoiYXN0ZXJpc2tyaW4iLCJhIjoiY2xhNm9mMnJwMXBteTN2cGg0dGlzO
 app = Flask(__name__)
 
 @app.route('/')
-def hello():
+def main_page():
     return render_template('index.html')
-
-# def getLatLngFromAddress(addr):
-#     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{urllib.parse.quote(addr)}.json?country=ID&access_token={MAPBOX_TOKEN}"
-#     resp = requests.get(url)
-#     if resp.status_code == 200:
-#         try:
-#             coords = json.loads(resp.content)['features'][0]['geometry']['coordinates']
-#             print (json.loads(resp.content))
-#             return [coords[1], coords[0]]
-#         except:
-#             raise Exception("Could not extract latitude and longtitude data from address " + addr)
-#     else:
-#         return []
 
 '''
 getSegmentData
@@ -45,7 +32,7 @@ def getSegmentData(from_pos, to_pos):
         except:
             raise Exception("Could not extract geometry data") 
     else:
-        return None
+        raise Exception("API not available")
 
 '''
 run_nna
@@ -89,8 +76,6 @@ def run_nna(vehicle_capacity, nodes, matrix_geometry, matrix_distance, matrix_du
 
 @app.route('/run', methods=["POST"])
 def run():
-    errors = []
-
     depot = [float(request.form['depot-lat']), float(request.form['depot-lng']), int(0), 'Depot']
 
     vehicle_capacity = int(request.form['vehicle-capacity'])
@@ -149,6 +134,7 @@ def run():
                 g = g.replace('\\', '\\\\')
                 geometry.append(g)
                 curr_pos = id
+        geometry.append(matrix_geometry[t[-1]][0].replace('\\', '\\\\'))
         result.append({
             "waypoint": waypoints,
             "geometry": geometry
